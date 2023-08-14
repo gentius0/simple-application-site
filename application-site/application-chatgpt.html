@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Application Site</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f2f2f2;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #6b3e9c;
+        }
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            resize: vertical;
+        }
+        button {
+            background-color: #6b3e9c;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #512d73;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .search-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #answerForm,
+        #answersContainer {
+            display: none;
+        }
+        #answerForm h2,
+        #answersContainer h2 {
+            color: #6b3e9c;
+            margin-bottom: 10px;
+        }
+        #answerForm input[type="password"],
+        #answerForm textarea,
+        #answersContainer ul {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        #answerForm button,
+        #answersContainer button {
+            background-color: #6b3e9c;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #answerForm button:hover,
+        #answersContainer button:hover {
+            background-color: #512d73;
+        }
+        #answersList {
+            list-style: none;
+            padding: 0;
+        }
+        #answersList li {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Team Application Site</h1>
+        <h2>Create a Form</h2>
+        <form id="createForm">
+            <input type="password" id="password" placeholder="Set a Password" required>
+            <input type="text" id="tag" placeholder="Tag" required>
+            <textarea id="question1" placeholder="Question 1" required></textarea>
+            <textarea id="question2" placeholder="Question 2"></textarea>
+            <textarea id="question3" placeholder="Question 3"></textarea>
+            <textarea id="question4" placeholder="Question 4"></textarea>
+            <textarea id="question5" placeholder="Question 5"></textarea>
+            <button type="submit">Create Form</button>
+        </form>
+    </div>
+
+    <div class="search-container">
+        <h2>Search for Forms by Tag</h2>
+        <input type="text" id="searchTag" placeholder="Enter tag">
+        <button onclick="searchForms()">Search</button>
+    </div>
+
+    <div id="answerForm" class="form-container" style="display: none;">
+        <h2>Answer the Questions</h2>
+        <form id="answerQuestions">
+            <input type="password" id="formPassword" placeholder="Form Password" required>
+            <textarea id="answer1" placeholder="Answer 1" required></textarea>
+            <textarea id="answer2" placeholder="Answer 2"></textarea>
+            <textarea id="answer3" placeholder="Answer 3"></textarea>
+            <textarea id="answer4" placeholder="Answer 4"></textarea>
+            <textarea id="answer5" placeholder="Answer 5"></textarea>
+            <button type="submit">Submit Answers</button>
+        </form>
+    </div>
+
+    <div id="answersContainer" class="form-container" style="display: none;">
+        <h2>Answers for the Form</h2>
+        <ul id="answersList">
+            <!-- Answers will be dynamically added here -->
+        </ul>
+    </div>
+
+    <script>
+        const forms = [];
+
+        document.getElementById('createForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            
+            const password = document.getElementById('password').value.trim();
+            const tag = document.getElementById('tag').value.trim();
+            const questions = [
+                document.getElementById('question1').value.trim(),
+                document.getElementById('question2').value.trim(),
+                document.getElementById('question3').value.trim(),
+                document.getElementById('question4').value.trim(),
+                document.getElementById('question5').value.trim()
+            ].filter(question => question !== '');
+
+            if (password && tag && questions.length >= 1 && questions.length <= 5) {
+                const form = {
+                    password,
+                    tag,
+                    questions,
+                    answers: [],
+                };
+                forms.push(form);
+                console.log(form); // This would typically send the form data to a server
+                alert('Form created successfully!');
+                document.getElementById('createForm').reset();
+            } else {
+                alert('Please enter a valid password, tag, and 1 to 5 questions.');
+            }
+        });
+
+        function searchForms() {
+            const searchTag = document.getElementById('searchTag').value.trim();
+            const filteredForms = forms.filter(form => form.tag === searchTag);
+            displayForms(filteredForms);
+        }
+
+        function displayForms(filteredForms) {
+            const resultContainer = document.createElement('div');
+            resultContainer.classList.add('search-container');
+            document.body.appendChild(resultContainer);
+
+            if (filteredForms.length > 0) {
+                const h3 = document.createElement('h3');
+                h3.textContent = 'Matching Forms:';
+                resultContainer.appendChild(h3);
+
+                const ul = document.createElement('ul');
+                filteredForms.forEach(form => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>Tag:</strong> ${form.tag}<br>`;
+                    form.questions.forEach((question, index) => {
+                        li.innerHTML += `<strong>Question ${index + 1}:</strong> ${question}<br>`;
+                    });
+                    const answerButton = document.createElement('button');
+                    answerButton.textContent = 'Answer';
+                    answerButton.addEventListener('click', () => showAnswerForm(form));
+                    li.appendChild(answerButton);
+                    ul.appendChild(li);
+                });
+                resultContainer.appendChild(ul);
+            } else {
+                const p = document.createElement('p');
+                p.textContent = 'No forms found for the specified tag.';
+                resultContainer.appendChild(p);
+            }
+        }
+
+        function showAnswerForm(form) {
+            document.getElementById('formPassword').value = '';
+            document.getElementById('answer1').value = '';
+            document.getElementById('answer2').value = '';
+            document.getElementById('answer3').value = '';
+            document.getElementById('answer4').value = '';
+            document.getElementById('answer5').value = '';
+            document.getElementById('answerForm').style.display = 'block';
+            document.getElementById('answersContainer').style.display = 'none';
+            document.getElementById('answerQuestions').addEventListener('submit', function (event) {
+                event.preventDefault();
+                const enteredPassword = document.getElementById('formPassword').value.trim();
+                if (enteredPassword !== form.password) {
+                    alert('Incorrect password. Please enter the correct form password.');
+                    return;
+                }
+                const answers = [
+                    document.getElementById('answer1').value.trim(),
+                    document.getElementById('answer2').value.trim(),
+                    document.getElementById('answer3').value.trim(),
+                    document.getElementById('answer4').value.trim(),
+                    document.getElementById('answer5').value.trim(),
+                ];
+                form.answers.push(answers);
+                alert('Answers submitted successfully!');
+                document.getElementById('answerForm').style.display = 'none';
+                document.getElementById('answersContainer').style.display = 'block';
+                displayAnswers(form);
+            });
+        }
+
+        function displayAnswers(form) {
+            const answersList = document.getElementById('answersList');
+            answersList.innerHTML = '';
+            form.answers.forEach((answers, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>Answers for Submission ${index + 1}:</strong><br>`;
+                answers.forEach((answer, answerIndex) => {
+                    li.innerHTML += `<strong>Answer ${answerIndex + 1}:</strong> ${answer}<br>`;
+                });
+                answersList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
+
